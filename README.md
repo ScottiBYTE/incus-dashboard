@@ -193,3 +193,65 @@ then open:
 ```text
 http://YOUR-SERVER-IP:8080
 ```
+
+---
+
+# Version 1.1 Enhancements
+
+Version 1.1 introduces major usability and visual improvements to the dashboard interface including:
+
+* Alternating row highlighting for improved readability
+* Interactive status and summary indicators
+* Enhanced sticky headers
+* Click-to-copy support for:
+
+  * Container names
+  * IP addresses
+  * MAC addresses
+* Row selection highlighting
+* CPU and memory utilization color indicators
+* Improved stopped-container visibility
+* Responsive UI refinements
+* Modernized observability-style dashboard appearance
+
+The dashboard remains intentionally lightweight while providing a centralized operational view across distributed Incus infrastructure.
+
+---
+
+# Security Notes
+
+* The dashboard uses the native Incus client and trusted remote relationships
+* No privileged Docker mode is required
+* No database is used or stored
+* Remote authentication is handled through standard Incus trust certificates
+* The mounted Incus configuration is read-only inside the container
+
+---
+
+# Future Development
+
+Planned future enhancements may include:
+
+* Container start/stop controls
+* Resource graphs and historical metrics
+* Host health indicators
+* Snapshot visibility
+* Storage pool visibility
+* VM support enhancements
+* Search and filtering improvements
+* Mobile dashboard optimizations
+
+---
+
+# Support the Project
+
+If you find the ScottiBYTE Incus Dashboard useful:
+
+* Subscribe to the ScottiBYTE YouTube channel
+* Join the community discussion forums
+* Share feedback and feature suggestions
+* Contribute improvements and ideas
+
+ScottiBYTE focuses on practical Incus, Linux, Docker, and homelab infrastructure education for real-world environments.
+
+---
