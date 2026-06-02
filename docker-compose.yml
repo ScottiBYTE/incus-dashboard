@@ -1,0 +1,11 @@
+services:
+  incus-dashboard:
+    build: .
+    image: scottibyte/incus-dashboard:latest
+    container_name: incus-dashboard
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - /home/scott/.config/incus:/root/.config/incus:ro
+

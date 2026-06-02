@@ -1,0 +1,12 @@
+{
+  "name": "incus-dashboard",
+  "version": "1.0.0",
+  "description": "ScottiBYTE Incus Container Dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.3"
+  }
+}

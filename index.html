@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Incus Dashboard</title>
+  <style>
+    :root {
+      --header-height: 86px;
+      --bg: #111;
+      --text: #eee;
+      --muted: #aaa;
+      --panel: #1b1b1b;
+      --panel-2: #222;
+      --input-bg: #1b1b1b;
+      --input-border: #444;
+      --row-odd: #121212;
+      --row-even: #1b1b1b;
+      --row-hover: #263040;
+      --row-selected: #243247;
+      --border: #333;
+      --shadow: rgba(0,0,0,0.9);
+    }
+
+    body.light {
+      --bg: #eef3f9;
+      --text: #162334;
+      --muted: #5f7288;
+      --panel: #ffffff;
+      --panel-2: #dde7f1;
+      --input-bg: #ffffff;
+      --input-border: #bccbda;
+      --row-odd: #ffffff;
+      --row-even: #edf4fb;
+      --row-hover: #dcecff;
+      --row-selected: #c7e0ff;
+      --border: #cdd9e6;
+      --shadow: rgba(15, 23, 42, 0.16);
+    }
+
+    body.light {
+      --bg: #f5f7fb;
+      --text: #1e293b;
+      --muted: #64748b;
+      --panel: #ffffff;
+      --panel-2: #e8eef8;
+      --input-bg: #ffffff;
+      --input-border: #cbd5e1;
+      --row-odd: #ffffff;
+      --row-even: #f1f5f9;
+      --row-hover: #dbeafe;
+      --row-selected: #c7ddfb;
+      --border: #cbd5e1;
+      --shadow: rgba(15,23,42,0.22);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: var(--header-height) 10px 20px 10px;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-height);
+      background: var(--bg);
+      z-index: 3000;
+      padding: 4px 10px 10px 10px;
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    h2 {
+      margin: 0 0 8px 0;
+      font-size: 24px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      min-width: 620px;
+    }
+
+    .header-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .header-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      padding: 6px 9px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1;
+      text-decoration: none;
+      cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: #8ecbff;
+    }
+
+    .header-pill:hover {
+      filter: brightness(1.15);
+      text-decoration: none;
+    }
+
+    .donate-pill {
+      color: #ff7b72;
+    }
+
+    .theme-pill {
+      color: #fff;
+      background: #2f6feb;
+      border-color: #2f6feb;
+    }
+
+    body.light .header-pill {
+      background: rgba(15,23,42,0.05);
+      border-color: rgba(15,23,42,0.14);
+      color: #0969da;
+    }
+
+    body.light .donate-pill {
+      color: #cf222e;
+    }
+
+    body.light .theme-pill {
+      color: #fff;
+      background: #2f6feb;
+      border-color: #2f6feb;
+    }
+
+    .summary-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .summary-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: #ddd;
+    }
+
+    .summary-total {
+      color: #cfd8dc;
+      border-color: rgba(207,216,220,0.3);
+      box-shadow: 0 0 8px rgba(207,216,220,0.12);
+    }
+
+    .summary-running {
+      color: #56d364;
+      background: rgba(76,175,80,0.14);
+      border-color: rgba(76,175,80,0.42);
+      box-shadow: 0 0 8px rgba(76,175,80,0.18);
+    }
+
+    .summary-stopped {
+      color: #ff6b6b;
+      background: rgba(244,67,54,0.14);
+      border-color: rgba(244,67,54,0.42);
+      box-shadow: 0 0 8px rgba(244,67,54,0.18);
+    }
+
+    .summary-filtered {
+      color: #ffd866;
+      background: rgba(255,193,7,0.13);
+      border-color: rgba(255,193,7,0.38);
+    }
+
+    .summary-refresh {
+      color: #8ecbff;
+      background: rgba(33,150,243,0.12);
+      border-color: rgba(33,150,243,0.36);
+    }
+
+    .summary-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      display: inline-block;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    .search-label {
+      display: inline-block;
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .search-box {
+      width: 340px;
+      background: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--input-border);
+      border-radius: 6px;
+      padding: 9px 10px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .search-box:focus {
+      border-color: #777;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.08);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background: var(--panel-2);
+      position: sticky;
+      top: var(--header-height);
+      z-index: 2000;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.85);
+    }
+
+    th:hover {
+      background: var(--row-hover);
+    }
+
+    tbody tr:nth-child(odd) {
+      background: var(--row-odd);
+    }
+
+    tbody tr:nth-child(even) {
+      background: var(--row-even);
+    }
+
+    tbody tr:hover {
+      background: var(--row-hover);
+    }
+
+    tbody tr.selected-row {
+      background: var(--row-selected) !important;
+      outline: 1px solid rgba(142,203,255,0.35);
+      outline-offset: -1px;
+    }
+
+    tr.stopped-row {
+      opacity: 0.66;
+    }
+
+    td:nth-child(2) {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .right {
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .bubble {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: bold;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .copyable {
+      cursor: copy;
+      user-select: none;
+    }
+
+    .copyable:hover {
+      filter: brightness(1.25);
+      text-decoration: underline;
+    }
+
+    .bubble-running {
+      background: rgba(76,175,80,0.18);
+      color: #56d364;
+      border: 1px solid rgba(76,175,80,0.45);
+      box-shadow: 0 0 8px rgba(76,175,80,0.25);
+    }
+
+    .bubble-stopped {
+      background: rgba(244,67,54,0.18);
+      color: #ff5252;
+      border: 1px solid rgba(244,67,54,0.45);
+      box-shadow: 0 0 8px rgba(244,67,54,0.25);
+    }
+
+    .bubble-host {
+      background: rgba(33,150,243,0.16);
+      color: #8ecbff;
+      border: 1px solid rgba(33,150,243,0.38);
+    }
+
+    .bubble-ip {
+      background: rgba(156,39,176,0.16);
+      color: #d59cff;
+      border: 1px solid rgba(156,39,176,0.38);
+      font-family: Consolas, monospace;
+    }
+
+    .bubble-mac {
+      background: rgba(96,125,139,0.18);
+      color: #cfd8dc;
+      border: 1px solid rgba(96,125,139,0.42);
+      font-family: Consolas, monospace;
+    }
+
+    .bubble-cpu-low,
+    .bubble-mem-low {
+      background: rgba(76,175,80,0.14);
+      color: #8df58d;
+      border: 1px solid rgba(76,175,80,0.35);
+    }
+
+    .bubble-cpu-med,
+    .bubble-mem-med {
+      background: rgba(255,193,7,0.16);
+      color: #ffd866;
+      border: 1px solid rgba(255,193,7,0.45);
+    }
+
+    .bubble-cpu-high,
+    .bubble-mem-high {
+      background: rgba(244,67,54,0.18);
+      color: #ff6b6b;
+      border: 1px solid rgba(244,67,54,0.5);
+    }
+
+    .bubble-na {
+      background: rgba(158,158,158,0.12);
+      color: #bbb;
+      border: 1px solid rgba(158,158,158,0.3);
+    }
+
+    .sort-indicator {
+      color: var(--muted);
+      font-size: 12px;
+      margin-left: 6px;
+    }
+
+    .no-results {
+      color: var(--muted);
+      text-align: center;
+      padding: 18px;
+      font-style: italic;
+    }
+
+    .toast {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 5000;
+      background: rgba(33,150,243,0.18);
+      color: #8ecbff;
+      border: 1px solid rgba(33,150,243,0.45);
+      box-shadow: 0 0 12px rgba(0,0,0,0.7);
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: bold;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* UniFi-like light mode overrides */
+    body.light {
+      background: #edf3f9;
+      color: #162334;
+    }
+
+    body.light .header {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      border-bottom: 1px solid #ccd9e6;
+      box-shadow: 0 4px 16px rgba(15,23,42,0.15);
+    }
+
+    body.light h2 {
+      color: #132033;
+      letter-spacing: -0.25px;
+      font-weight: 800;
+    }
+
+    /* richer table header */
+    body.light th {
+      background: linear-gradient(180deg, #e7eef7 0%, #dbe6f1 100%);
+      color: #26384e;
+      border-top: 1px solid #f8fbff;
+      border-bottom: 1px solid #b8c8d8;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.85),
+        0 2px 8px rgba(15,23,42,0.10);
+      font-weight: 800;
+      letter-spacing: 0.1px;
+    }
+
+    body.light th:hover {
+      background: linear-gradient(180deg, #dfeaf5 0%, #cfddea 100%);
+      color: #17263a;
+    }
+
+    body.light .sort-indicator {
+      color: #5b7088;
+      font-weight: 900;
+    }
+
+    body.light tbody tr:nth-child(odd) {
+      background: #ffffff;
+    }
+
+    body.light tbody tr:nth-child(even) {
+      background: #eaf2fa;
+    }
+
+    body.light tbody tr:hover {
+      background: #d7eaff;
+    }
+
+    body.light tbody tr.selected-row {
+      background: #c3ddff !important;
+      outline: 1px solid rgba(37,99,235,0.62);
+      outline-offset: -1px;
+      box-shadow: inset 3px 0 0 #2f80ed;
+    }
+
+    body.light td {
+      border-bottom: 1px solid #ccd9e6;
+      color: #162334;
+    }
+
+    body.light td:nth-child(2) {
+      color: #0f172a;
+      font-weight: 800;
+    }
+
+    body.light .search-label {
+      color: #4b6078;
+      font-weight: 700;
+    }
+
+    body.light .search-box {
+      background: #ffffff;
+      color: #162334;
+      border: 1px solid #b8c8d8;
+      box-shadow:
+        inset 0 1px 2px rgba(15,23,42,0.06),
+        0 1px 2px rgba(15,23,42,0.04);
+    }
+
+    body.light .search-box:focus {
+      border-color: #1d72f3;
+      box-shadow:
+        0 0 0 2px rgba(29,114,243,0.18),
+        inset 0 1px 2px rgba(15,23,42,0.05);
+    }
+
+    /* deeper summary pills */
+    body.light .summary-pill {
+      background: linear-gradient(180deg, #ffffff 0%, #f4f8fc 100%);
+      border-color: #c8d5e2;
+      box-shadow:
+        0 1px 3px rgba(15,23,42,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.95);
+      font-weight: 800;
+    }
+
+    body.light .summary-total {
+      color: #2c3e52;
+      background: linear-gradient(180deg, #ffffff 0%, #f2f6fb 100%);
+      border-color: #bfccd9;
+    }
+
+    body.light .summary-running {
+      color: #087a38;
+      background: linear-gradient(180deg, #effdf5 0%, #d9f8e5 100%);
+      border-color: #72d694;
+      box-shadow:
+        0 1px 5px rgba(8,122,56,0.16),
+        inset 0 1px 0 rgba(255,255,255,0.85);
+    }
+
+    body.light .summary-stopped {
+      color: #c5162e;
+      background: linear-gradient(180deg, #fff5f5 0%, #ffe0e0 100%);
+      border-color: #ef9a9a;
+      box-shadow:
+        0 1px 5px rgba(197,22,46,0.15),
+        inset 0 1px 0 rgba(255,255,255,0.85);
+    }
+
+    body.light .summary-filtered {
+      color: #8a5a00;
+      background: linear-gradient(180deg, #fffbea 0%, #fff0b8 100%);
+      border-color: #e7bd45;
+    }
+
+    body.light .summary-refresh {
+      color: #155eef;
+      background: linear-gradient(180deg, #f2f8ff 0%, #dcecff 100%);
+      border-color: #87b6f7;
+      box-shadow:
+        0 1px 5px rgba(21,94,239,0.14),
+        inset 0 1px 0 rgba(255,255,255,0.85);
+    }
+
+    body.light .summary-dot {
+      opacity: 1;
+      box-shadow: 0 0 9px currentColor;
+    }
+
+    body.light .header-pill {
+      background: linear-gradient(180deg, #ffffff 0%, #f3f7fb 100%);
+      border: 1px solid #c7d4e2;
+      color: #1d4ed8;
+      box-shadow:
+        0 1px 4px rgba(15,23,42,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.95);
+      font-weight: 800;
+    }
+
+    body.light .header-pill:hover {
+      background: linear-gradient(180deg, #f7fbff 0%, #e8f2ff 100%);
+    }
+
+    body.light .donate-pill {
+      color: #c5162e;
+      background: linear-gradient(180deg, #fff7f7 0%, #ffe9e9 100%);
+      border-color: #efb1b1;
+    }
+
+    body.light .theme-pill {
+      color: #ffffff;
+      background: linear-gradient(180deg, #3478f6 0%, #1d5fd7 100%);
+      border-color: #1d5fd7;
+      box-shadow: 0 2px 6px rgba(29,95,215,0.22);
+    }
+
+    /* more saturated chips / badges */
+    body.light .bubble {
+      font-weight: 800;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
+    }
+
+    body.light .bubble-host {
+      background: linear-gradient(180deg, #dff0ff 0%, #c8e4ff 100%);
+      color: #075b9a;
+      border-color: #79baf5;
+    }
+
+    body.light .bubble-ip {
+      background: linear-gradient(180deg, #f3ddff 0%, #e7c4ff 100%);
+      color: #7416b5;
+      border-color: #c987f2;
+    }
+
+    body.light .bubble-mac {
+      background: linear-gradient(180deg, #edf3f8 0%, #dce6ef 100%);
+      color: #26384e;
+      border-color: #b8c8d8;
+    }
+
+    body.light .bubble-running {
+      background: linear-gradient(180deg, #dff9e8 0%, #c6f0d5 100%);
+      color: #087a38;
+      border-color: #67ce89;
+    }
+
+    body.light .bubble-stopped {
+      background: linear-gradient(180deg, #ffe8e8 0%, #ffd1d1 100%);
+      color: #c5162e;
+      border-color: #ee9494;
+    }
+
+    body.light .bubble-cpu-low,
+    body.light .bubble-mem-low {
+      background: linear-gradient(180deg, #ddf8e5 0%, #c6f0d5 100%);
+      color: #087a38;
+      border-color: #72d694;
+    }
+
+    body.light .bubble-cpu-med,
+    body.light .bubble-mem-med {
+      background: linear-gradient(180deg, #fff3c7 0%, #ffe59a 100%);
+      color: #8a5a00;
+      border-color: #d6a92c;
+    }
+
+    body.light .bubble-cpu-high,
+    body.light .bubble-mem-high {
+      background: linear-gradient(180deg, #ffe3e3 0%, #ffcaca 100%);
+      color: #c5162e;
+      border-color: #eb8f8f;
+    }
+
+    body.light .bubble-na {
+      background: linear-gradient(180deg, #f3f6fa 0%, #e6edf4 100%);
+      color: #64748b;
+      border-color: #c4d0dc;
+    }
+
+    body.light tr.stopped-row {
+      opacity: 0.82;
+    }
+
+    body.light .toast {
+      background: #edf5ff;
+      color: #155eef;
+      border-color: #9dc2ff;
+      box-shadow: 0 4px 16px rgba(15,23,42,0.18);
+    }
+        /* End UniFi-like light mode overrides */
+
+
+
+
+    @media (max-width: 900px) {
+      :root {
+        --header-height: 185px;
+      }
+
+      .header-top {
+        flex-direction: column;
+      }
+
+      .header-right {
+        width: 100%;
+        align-items: stretch;
+        min-width: 0;
+        flex-direction: column;
+      }
+
+      .header-search {
+        width: 100%;
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .header-actions {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+
+      .search-box {
+        width: 100%;
+      }
+
+      .header {
+        height: var(--header-height);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <h2>ScottiBYTE Incus Container Overview</h2>
+        <div class="summary-pills" id="meta">
+          <span class="summary-pill">Loading...</span>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="header-search">
+          <label class="search-label" for="searchBox">Search</label>
+          <input
+            id="searchBox"
+            class="search-box"
+            type="text"
+            placeholder="Search host, container, DNS, IP, MAC..."
+            autocomplete="off"
+          >
+        </div>
+
+        <div class="header-actions">
+          <a id="versionPill" class="header-pill version-pill" href="https://github.com/ScottiBYTE/incus-dashboard/releases" target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a id="donateButton" class="header-pill donate-pill" href="https://www.paypal.com/paypalme/ScottiBYTE" target="_blank" rel="noopener noreferrer" title="Support ScottiBYTE Incus Dashboard development">❤️ Donate</a>
+          <button id="themeToggle" class="header-pill theme-pill" type="button">☀ Light</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th data-sort="host">Host<span class="sort-indicator" id="ind-host"></span></th>
+        <th data-sort="name">Container Name<span class="sort-indicator" id="ind-name"></span></th>
+        <th data-sort="dns_name">DNS Name<span class="sort-indicator" id="ind-dns_name"></span></th>
+        <th data-sort="status">Status<span class="sort-indicator" id="ind-status"></span></th>
+        <th data-sort="ip">IP<span class="sort-indicator" id="ind-ip"></span></th>
+        <th data-sort="mac">MAC<span class="sort-indicator" id="ind-mac"></span></th>
+        <th class="right" data-sort="cpu">CPU %<span class="sort-indicator" id="ind-cpu"></span></th>
+        <th class="right" data-sort="memory">Memory<span class="sort-indicator" id="ind-memory"></span></th>
+        <th data-sort="disk">Disk Used / Total<span class="sort-indicator" id="ind-disk"></span></th>
+      </tr>
+    </thead>
+    <tbody id="table"></tbody>
+  </table>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    let currentData = [];
+    let currentSort = { key: 'name', direction: 'asc' };
+    let currentSearch = '';
+    let selectedKey = '';
+    let toastTimer = null;
+
+    async function loadAppConfig() {
+      const defaults = {
+        appName: 'ScottiBYTE Incus Dashboard',
+        version: 'unknown',
+        githubReleasesUrl: 'https://github.com/ScottiBYTE/incus-dashboard/releases',
+        donateUrl: 'https://www.paypal.com/paypalme/ScottiBYTE'
+      };
+
+      let config = defaults;
+
+      try {
+        const res = await fetch('/api/config?_=' + Date.now(), { cache: 'no-store' });
+        if (res.ok) {
+          config = { ...defaults, ...(await res.json()) };
+        }
+      } catch (err) {
+        console.warn('Using default app config', err);
+      }
+
+      const versionPill = document.getElementById('versionPill');
+      if (versionPill) {
+        versionPill.href = config.githubReleasesUrl;
+        versionPill.textContent = `GitHub ${config.version}`;
+        versionPill.title = `View ${config.appName} ${config.version} on GitHub`;
+      }
+
+      const donateButton = document.getElementById('donateButton');
+      if (donateButton) {
+        donateButton.href = config.donateUrl;
+        donateButton.title = `Support ${config.appName} development`;
+      }
+
+      document.title = config.appName;
+    }
+
+    function applyTheme(theme) {
+      const selected = theme === 'light' ? 'light' : 'dark';
+      document.body.classList.toggle('light', selected === 'light');
+
+      const button = document.getElementById('themeToggle');
+      if (button) {
+        button.textContent = selected === 'light' ? '☾ Dark' : '☀ Light';
+      }
+
+      localStorage.setItem('incusDashboardTheme', selected);
+    }
+
+    function toggleTheme() {
+      const current = localStorage.getItem('incusDashboardTheme') || 'dark';
+      applyTheme(current === 'light' ? 'dark' : 'light');
+    }
+
+    function esc(v) {
+      return String(v ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function rowKey(c) {
+      return `${c.host || ''}::${c.name || ''}::${c.ip || ''}::${c.mac || ''}`;
+    }
+
+    function parseCpu(value) {
+      const n = parseFloat(value);
+      return Number.isFinite(n) ? n : -1;
+    }
+
+    function parseBytes(text) {
+      if (!text || text === 'N/A') return -1;
+
+      const firstPart = String(text).split('/')[0].trim();
+      const match = firstPart.match(/^([\d.]+)\s*(B|KB|MB|GB|TB)$/i);
+      if (!match) return -1;
+
+      const num = parseFloat(match[1]);
+      const unit = match[2].toUpperCase();
+
+      const factors = {
+        B: 1,
+        KB: 1024,
+        MB: 1024 ** 2,
+        GB: 1024 ** 3,
+        TB: 1024 ** 4
+      };
+
+      return num * factors[unit];
+    }
+
+    function compareIp(a, b) {
+      const pa = String(a || '').split('.').map(x => parseInt(x, 10));
+      const pb = String(b || '').split('.').map(x => parseInt(x, 10));
+
+      for (let i = 0; i < 4; i++) {
+        const va = Number.isFinite(pa[i]) ? pa[i] : -1;
+        const vb = Number.isFinite(pb[i]) ? pb[i] : -1;
+        if (va !== vb) return va - vb;
+      }
+
+      return 0;
+    }
+
+    function compareValues(a, b, key) {
+      if (key === 'cpu') return parseCpu(a.cpu) - parseCpu(b.cpu);
+      if (key === 'memory') return parseBytes(a.memory) - parseBytes(b.memory);
+      if (key === 'disk') return parseBytes(a.disk) - parseBytes(b.disk);
+      if (key === 'ip') return compareIp(a.ip, b.ip);
+
+      const av = String(a[key] ?? '').toLowerCase();
+      const bv = String(b[key] ?? '').toLowerCase();
+      return av.localeCompare(bv);
+    }
+
+    function updateSortIndicators() {
+      document.querySelectorAll('.sort-indicator').forEach(el => {
+        el.textContent = '';
+      });
+
+      const active = document.getElementById(`ind-${currentSort.key}`);
+      if (active) {
+        active.textContent = currentSort.direction === 'asc' ? '▲' : '▼';
+      }
+    }
+
+    function sortData(data) {
+      return [...data].sort((a, b) => {
+        let result = compareValues(a, b, currentSort.key);
+
+        if (result === 0) {
+          result = compareValues(a, b, 'host');
+          if (result === 0) result = compareValues(a, b, 'name');
+        }
+
+        return currentSort.direction === 'asc' ? result : -result;
+      });
+    }
+
+    function itemMatchesSearch(item, term) {
+      if (!term) return true;
+
+      const haystack = [
+        item.host,
+        item.name,
+        item.dns_name,
+        item.status,
+        item.ip,
+        item.mac,
+        item.cpu,
+        item.memory,
+        item.disk
+      ]
+      .map(v => String(v ?? '').toLowerCase())
+      .join(' ');
+
+      return haystack.includes(term);
+    }
+
+    function updateMeta(allData, filteredCount) {
+      const meta = document.getElementById('meta');
+      const running = allData.filter(x => String(x.status).toLowerCase() === 'running').length;
+      const stopped = allData.length - running;
+      const lastRefresh = window.__lastRefreshText || 'Unknown';
+
+      let html = `
+        <span class="summary-pill summary-total">
+          <span class="summary-dot"></span> Containers: ${esc(allData.length)}
+        </span>
+        <span class="summary-pill summary-running">
+          <span class="summary-dot"></span> Running: ${esc(running)}
+        </span>
+        <span class="summary-pill summary-stopped">
+          <span class="summary-dot"></span> Not running: ${esc(stopped)}
+        </span>
+      `;
+
+      if (currentSearch) {
+        html += `
+          <span class="summary-pill summary-filtered">
+            <span class="summary-dot"></span> Filtered: ${esc(filteredCount)}
+          </span>
+        `;
+      }
+
+      html += `
+        <span class="summary-pill summary-refresh">
+          <span class="summary-dot"></span> Last refresh: ${esc(lastRefresh)}
+        </span>
+      `;
+
+      meta.innerHTML = html;
+    }
+
+    function cpuBubbleClass(cpu) {
+      const value = parseCpu(cpu);
+
+      if (value < 0) return 'bubble-na';
+      if (value >= 80) return 'bubble-cpu-high';
+      if (value >= 25) return 'bubble-cpu-med';
+      return 'bubble-cpu-low';
+    }
+
+    function memoryBubbleClass(memory) {
+      const bytes = parseBytes(memory);
+
+      if (bytes < 0) return 'bubble-na';
+
+      const gb = bytes / (1024 ** 3);
+
+      if (gb >= 3) return 'bubble-mem-high';
+      if (gb >= 1) return 'bubble-mem-med';
+      return 'bubble-mem-low';
+    }
+
+    function statusBubbleClass(status) {
+      return String(status).toLowerCase() === 'running'
+        ? 'bubble-running'
+        : 'bubble-stopped';
+    }
+
+    async function copyText(value, label) {
+      if (!value) return;
+
+      try {
+        await navigator.clipboard.writeText(value);
+        showToast(`Copied ${label}: ${value}`);
+      } catch (err) {
+        fallbackCopy(value);
+        showToast(`Copied ${label}: ${value}`);
+      }
+    }
+
+    function fallbackCopy(value) {
+      const el = document.createElement('textarea');
+      el.value = value;
+      el.style.position = 'fixed';
+      el.style.left = '-9999px';
+      document.body.appendChild(el);
+      el.focus();
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 1600);
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('table');
+      tbody.innerHTML = '';
+
+      const filtered = data.filter(item => itemMatchesSearch(item, currentSearch));
+      const sorted = sortData(filtered);
+
+      for (const c of sorted) {
+        const isRunning = String(c.status).toLowerCase() === 'running';
+        const cpuText = c.cpu || 'N/A';
+        const memText = c.memory || 'N/A';
+        const key = rowKey(c);
+
+        const tr = document.createElement('tr');
+        tr.dataset.key = key;
+
+        if (!isRunning) {
+          tr.classList.add('stopped-row');
+        }
+
+        if (selectedKey === key) {
+          tr.classList.add('selected-row');
+        }
+
+        tr.innerHTML = `
+          <td><span class="bubble bubble-host">${esc(c.host)}</span></td>
+          <td>
+            <span class="copyable" data-copy="${esc(c.name)}" data-label="container name" title="Click to copy container name">
+              ${esc(c.name)}
+            </span>
+          </td>
+          <td>${esc(c.dns_name || '')}</td>
+          <td><span class="bubble ${statusBubbleClass(c.status)}">${esc(c.status)}</span></td>
+          <td>
+            ${c.ip ? `
+              <span class="bubble bubble-ip copyable" data-copy="${esc(c.ip)}" data-label="IP" title="Click to copy IP">
+                ${esc(c.ip)}
+              </span>
+            ` : ''}
+          </td>
+          <td>
+            ${c.mac ? `
+              <span class="bubble bubble-mac copyable" data-copy="${esc(c.mac)}" data-label="MAC" title="Click to copy MAC">
+                ${esc(c.mac)}
+              </span>
+            ` : ''}
+          </td>
+          <td class="right"><span class="bubble ${cpuBubbleClass(cpuText)}">${esc(cpuText)}</span></td>
+          <td class="right"><span class="bubble ${memoryBubbleClass(memText)}">${esc(memText)}</span></td>
+          <td>${esc(c.disk || 'N/A')}</td>
+        `;
+
+        tr.addEventListener('click', () => {
+          selectedKey = key;
+          document.querySelectorAll('tbody tr').forEach(row => row.classList.remove('selected-row'));
+          tr.classList.add('selected-row');
+        });
+
+        tbody.appendChild(tr);
+      }
+
+      if (sorted.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="no-results" colspan="9">No matching containers</td>`;
+        tbody.appendChild(tr);
+      }
+
+      updateSortIndicators();
+      updateMeta(data, filtered.length);
+    }
+
+    async function load() {
+      try {
+        const res = await fetch('/api/containers?_=' + Date.now(), { cache: 'no-store' });
+        const payload = await res.json();
+
+        currentData = Array.isArray(payload.containers) ? payload.containers : [];
+
+        window.__lastRefreshText = payload.refreshedAt
+          ? new Date(payload.refreshedAt).toLocaleString()
+          : '';
+
+        renderTable(currentData);
+      } catch (err) {
+        console.error(err);
+        document.getElementById('meta').innerHTML =
+          '<span class="summary-pill summary-stopped">Failed to load dashboard data</span>';
+      }
+    }
+
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+      th.addEventListener('click', () => {
+        const key = th.dataset.sort;
+
+        if (currentSort.key === key) {
+          currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+          currentSort.key = key;
+          currentSort.direction = ['cpu', 'memory', 'disk'].includes(key) ? 'desc' : 'asc';
+        }
+
+        renderTable(currentData);
+      });
+    });
+
+    document.getElementById('searchBox').addEventListener('input', e => {
+      currentSearch = e.target.value.trim().toLowerCase();
+      renderTable(currentData);
+    });
+
+    document.addEventListener('click', e => {
+      const target = e.target.closest('.copyable');
+      if (!target) return;
+
+      const value = target.dataset.copy;
+      const label = target.dataset.label || 'value';
+
+      copyText(value, label);
+    });
+
+    loadAppConfig();
+    applyTheme(localStorage.getItem('incusDashboardTheme') || 'dark');
+
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', toggleTheme);
+    }
+
+    load();
+    setInterval(load, 3000);
+  </script>
+</body>
+</html>
+

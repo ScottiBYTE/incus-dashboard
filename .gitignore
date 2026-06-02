@@ -1,0 +1,24 @@
+# Node / npm
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local environment
+.env
+.env.*
+docker-compose.override.yml
+
+# Scratch / backup files
+scratch-cleanup*/
+*.bak
+*.bak-*
+*~
+*.tmp
+*.swp
+
+# OS/editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
