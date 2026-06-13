@@ -243,15 +243,20 @@ Planned future enhancements may include:
 
 ---
 
-# Support the Project
+# 🌐 Community
 
-If you find the ScottiBYTE Incus Dashboard useful:
+## Community Support
 
-* Subscribe to the ScottiBYTE YouTube channel
-* Join the community discussion forums
-* Share feedback and feature suggestions
-* Contribute improvements and ideas
+Need help with Incus Dashboard, Docker deployment, Incus profile management, container creation, or ScottiBYTE utilities?
 
-ScottiBYTE focuses on practical Incus, Linux, Docker, and homelab infrastructure education for real-world environments.
+Join the ScottiBYTE Rocket.Chat community:
+
+[Join ScottiBYTE Rocket.Chat](https://go.rocket.chat/invite?host=chat.scottibyte.com&path=invite%2FaCh2oW)
+
+New users can start in `#general`. From there, you can find other ScottiBYTE project channels and community discussions.
+
+For bugs and feature requests, please continue to use GitHub Issues.
+For quick questions and community discussion, use Rocket.Chat.
+```
 
 ---
