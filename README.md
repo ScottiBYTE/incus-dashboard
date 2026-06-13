@@ -257,6 +257,3 @@ New users can start in `#general`. From there, you can find other ScottiBYTE pro
 
 For bugs and feature requests, please continue to use GitHub Issues.
 For quick questions and community discussion, use Rocket.Chat.
-```
-
----
